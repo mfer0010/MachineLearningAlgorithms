@@ -28,12 +28,28 @@
 	
 	\section{Introduction}
 	\label{Intro}
-	\paragraph{} The Travelling Salesman Problem is a very common problem in the field of operations research, this problem has been studied extensively by mathematicians, computer scientists, and many great minds yet its complexity is still unknown \cite{TSP}. The problem statement is given as follows:\\
+	\paragraph{} The Travelling Salesman Problem is a very common problem in the field of operations research, studied extensively by mathematicians, computer scientists, and many great minds yet its complexity is still unknown \cite{TSP}. The problem statement is given as follows:\\
 	\hspace{0pt}\\
-	``Given a collection of cities and the cost of travel between each pair of them, the traveling salesman problem, or TSP for short, is to find the cheapest way of visiting all of the cities and returning to your starting point." \cite{TSP}\\
-	\par 
+	``Given a collection of cities and the cost of travel between each pair of them, the travelling salesman problem, or TSP for short, is to find the cheapest way of visiting all of the cities and returning to your starting point." \cite{TSP}\\
+	\par Traditional methods for solving this problem come in three types; calculus based methods, exhaustive search methods and random search methods \cite{Goldberg}. These methods however pose a large number of problems such as the algorithm converging to a local optimum or running in exponential time. Machine Learning Algorithms such as Genetic Algorithms (GAs) or the Ant-Colony Optimisation method (ACO) can be used to find accurate approximations to the solutions to the TSP and other similar optimisation problems. \\
+	\par In order to solve this problem using a Genetic Algorithm (Section \ref{GAs}) and the ACO method (Section \ref{ACO}), a few assumptions were made. Firstly, it was assumed that the data provided will come from a symmetric instance of TSP, i.e. the distance $d$ from city $c_i$ to city $c_j$ $d(c_i,c_j)=d(c_j,c_i)$ $\forall i,j\in [1,n]$. Another assumption that's being made is that the ``closed" version of TSP will be solved for this task, i.e. the salesman will end in the city where he started. 
 	\section{Genetic Algorithms}
 	\label{GAs}
+	\paragraph{} Genetic algorithms are designed to simulate a biological process \cite{GeneticAlgorithms}, thus most of the terminology refers to the algorithm's biological counterpart. The components that make up GAs are as follows:
+	\begin{itemize}
+		\item an objective (or fitness) function
+		\item a population of chromosomes
+		\item a selection operator on the chromosomes
+		\item a crossover function which produces a new generation of chromosomes
+		\item a random mutation function
+	\end{itemize}
+	\par The objective function is the function that the algorithm is trying to optimise. In Genetic Algorithms, this is often referred to as a \textit{fitness} function, this term is in fact taken from evolutionary theory \cite{GeneticAlgorithms}. For the TSP, the fitness function is the sum of the distances between the points, the TSP in fact deals with minimising this sum in order to be able to find the shortest path. Given that the data under study is given in coordinate format \cite{data}, the fitness function used for the TSP is given in Equation \ref{fitness} \cite{GeneticAlgorithms}.
+	\begin{equation}
+	\label{fitness}
+	D=\sum_{k=1}^{n}\sqrt{(x_{k+1}-x_k)^2+(y_{k+1}-y_k)^2}
+	\end{equation}
+	\par A chromosome refers to a value that will be considered as the candidate solution to the optimisation problem. In the case of the TSP, the chromosome could be a permutation of the cities which represent the order that the salesman visits each city. Historically, chromosomes were encoded as a bit string, however it would make more sense not to encode it in this way for the TSP, this however will require a change in the crossover and mutation functions \cite{GeneticAlgorithms}.\\
+	\par The selection operator refers to the method used to select which chromosomes are to be chosen for reproduction. In general, a fitter chromosome should be more likely to be selected. In the case of TSP, the probability function must be changed slightly from the original definition since the objective of the TSP is to minimize the fitness function (cost) and not maximize it, thus care must be taken to reverse the probability function. 
 	
 	\section{Ant-Colony Optimisation}
 	\label{ACO}
@@ -56,16 +72,28 @@
 	
 	\pagebreak
 	\begin{thebibliography}{9}
-		\bibitem{GeneticAlgorithms}
-		J. Carr.
-		\textit{An Introduction to Genetic Algorithms}.
-		\\\texttt{https://www.whitman.edu/Documents/Academics/Mathematics/2014/carrjk.pdf}.
-		\\{[16th May 2014]}.
-		
 		\bibitem{TSP}
 		uwaterloo.
 		\textit{The Problem}.
 		\\\texttt{http://www.math.uwaterloo.ca/tsp/problem/index.html}.
 		\\{[6th March 2018]}.
+		
+		\bibitem{GeneticAlgorithms}
+		Carr, J.
+		\textit{An Introduction to Genetic Algorithms}.
+		\\\texttt{https://www.whitman.edu/Documents/Academics/Mathematics/2014/carrjk.pdf}.
+		\\{[16th May 2014]}.
+		
+		\bibitem{Goldberg}
+		Goldberg, D. E.
+		\textit{Genetic Algorithms in Search, Optimization, and Machine
+			Learning}.
+		\\{[1989]}.
+		
+		\bibitem{data}
+		Unknown.
+		\textit{MP-TESTDATA - The TSPLIB Symmetric Traveling Salesman Problem Instances}.
+		\\\texttt{http://elib.zib.de/pub/mp-testdata/tsp/tsplib/tsp/index.html}
+		
 	\end{thebibliography}	
 \end{document}
