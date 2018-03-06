@@ -28,11 +28,12 @@
 	
 	\section{Introduction}
 	\label{Intro}
-	\paragraph{} The Travelling Salesman Problem is a very common problem in the field of operations research, studied extensively by mathematicians, computer scientists, and many great minds yet its complexity is still unknown \cite{TSP}. The problem statement is given as follows:\\
+	\paragraph{} The Travelling Salesman Problem is a very common problem in the field of operations research. This has been studied extensively by mathematicians, computer scientists, and many great minds yet its complexity is still unknown \cite{TSP}. The problem statement is given as follows:\\
 	\hspace{0pt}\\
 	``Given a collection of cities and the cost of travel between each pair of them, the travelling salesman problem, or TSP for short, is to find the cheapest way of visiting all of the cities and returning to your starting point." \cite{TSP}\\
-	\par Traditional methods for solving this problem come in three types; calculus based methods, exhaustive search methods and random search methods \cite{Goldberg}. These methods however pose a large number of problems such as the algorithm converging to a local optimum or running in exponential time. Machine Learning Algorithms such as Genetic Algorithms (GAs) or the Ant-Colony Optimisation method (ACO) can be used to find accurate approximations to the solutions to the TSP and other similar optimisation problems. \\
-	\par In order to solve this problem using a Genetic Algorithm (Section \ref{GAs}) and the ACO method (Section \ref{ACO}), a few assumptions were made. Firstly, it was assumed that the data provided will come from a symmetric instance of TSP, i.e. the distance $d$ from city $c_i$ to city $c_j$ $d(c_i,c_j)=d(c_j,c_i)$ $\forall i,j\in [1,n]$. Another assumption that's being made is that the ``closed" version of TSP will be solved for this task, i.e. the salesman will end in the city where he started. 
+	\par Traditional methods for solving this problem come in three types; calculus based methods, exhaustive search methods and random search methods \cite{Goldberg}. These methods, however, pose a large number of problems such as the algorithm converging to a local optimum or running in exponential time. Machine Learning Algorithms such as Genetic Algorithms (GAs) or the Ant-Colony Optimisation method (ACO) can be used to find accurate approximations to the solutions to the TSP and other similar optimisation problems. \\
+	\par In order to solve this problem using a Genetic Algorithm (Section \ref{GAs}) and the ACO method (Section \ref{ACO}), a few assumptions were made. Firstly, it was assumed that the data provided will come from a symmetric instance of TSP, i.e. the distance $d$ from city $c_i$ to city $c_j$ $d(c_i,c_j)=d(c_j,c_i)$ $\forall i,j\in [1,n]$. Another assumption that's being made is that the ``closed" version of TSP will be solved for this task, i.e. the salesman will end in the city where he started.\\
+	\par In Section \ref{GAs} of this paper, Genetic Algorithms shall be defined and a method to solve the TSP using such an algorithm will be proposed. Section \ref{ACO} shall define Ant-Colony Optimisation and propose a method for solving the TSP using this method. Section \ref{Results} will then compare the outcomes of the two algorithms and these results shall be discussed in detail. All code used will be listed in the Appendix (Section \ref{Appendix}). 
 	\section{Genetic Algorithms}
 	\label{GAs}
 	\paragraph{} Genetic algorithms are designed to simulate a biological process \cite{GeneticAlgorithms}, thus most of the terminology refers to the algorithm's biological counterpart. The components that make up GAs are as follows:
@@ -49,7 +50,17 @@
 	D=\sum_{k=1}^{n}\sqrt{(x_{k+1}-x_k)^2+(y_{k+1}-y_k)^2}
 	\end{equation}
 	\par A chromosome refers to a value that will be considered as the candidate solution to the optimisation problem. In the case of the TSP, the chromosome could be a permutation of the cities which represent the order that the salesman visits each city. Historically, chromosomes were encoded as a bit string, however it would make more sense not to encode it in this way for the TSP, this however will require a change in the crossover and mutation functions \cite{GeneticAlgorithms}.\\
-	\par The selection operator refers to the method used to select which chromosomes are to be chosen for reproduction. In general, a fitter chromosome should be more likely to be selected. In the case of TSP, the probability function must be changed slightly from the original definition since the objective of the TSP is to minimize the fitness function (cost) and not maximize it, thus care must be taken to reverse the probability function. 
+	\par The selection operator refers to the method used to select which chromosomes are to be chosen for reproduction. In general, a fitter chromosome should be more likely to be selected. In the case of TSP, the probability function must be changed slightly from the original definition since the objective of the TSP is to minimize the fitness function (cost) and not maximize it, thus care must be taken to reverse the probability function. \\
+	\par Once the ``fittest" chromosomes are selected, the crossover operator is then used to ``combine" them. This operator ``resembles the biological crossing over and recombination of chromosomes to create two offspring" \cite{GeneticAlgorithms}. In the case of the TSP, special care needs to be taken when designing this function and the classical way of defining this operator will not work since each city needs to be visited only once \cite{Haupt}. The technique which shall be used in the implementation for the TSP is known as the ``cycle" crossover (as taken from \cite{GeneticAlgorithms}) and works as follows:
+	\begin{enumerate}
+		\item Initially, a random location is chosen in the length of the chromosome.
+		\item The two parent chromosomes exchange integers at this point to create the offspring.
+		\item If the integers are the same value then the offspring is the same as the parent and the algorithm terminates.
+		\item Otherwise, each offspring now has a duplicate integer, so switch the duplicate integer in the first offspring with the integer in the same location in the second offspring.
+		\item Repeat the above step until there are no duplicates in the first offspring (and thus the second offspring).
+		\item Both are now valid permutations.
+	\end{enumerate}
+	\par The importance of the mutation step is to reduce the probability of the algorithm converging to a local optimum \cite{Haupt}. This is achieved by causing the algorithm to maintain diversity in the population, however it can cause it to converge more slowly \cite{GeneticAlgorithms}. Again, since the chromosome for the TSP is not encoded as a bit string, the mutation operator changes slightly from that described by Haupt in the original definition of a Genetic Algorithm. The implemented mutation operator randomly chooses two integers in a chromosome from the new generation and swaps them \cite{GeneticAlgorithms}. This will happen with a rather low probability in order to increase the rate of convergence.
 	
 	\section{Ant-Colony Optimisation}
 	\label{ACO}
@@ -94,6 +105,10 @@
 		Unknown.
 		\textit{MP-TESTDATA - The TSPLIB Symmetric Traveling Salesman Problem Instances}.
 		\\\texttt{http://elib.zib.de/pub/mp-testdata/tsp/tsplib/tsp/index.html}
+		
+		\bibitem{Haupt}
+		Haupt, R.L., \& Haupt, S.E. (2004).
+		\textit{Practical Genetic Algorithms} (2nd ed.). Hoboken: Wiley.
 		
 	\end{thebibliography}	
 \end{document}
