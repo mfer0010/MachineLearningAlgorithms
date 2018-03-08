@@ -6,6 +6,12 @@ X = Data[2] #X coordinates indexed by city
 Y = Data[3] #Y coordinats indexed by city
 rm(Data) #remove Data (not needed)
 
+#Normalize points to be between 0 and 1
+#This step is done so that our selection probabilities won't all have such 
+#large values
+X = X/max(X)
+Y = Y/max(Y)
+
 #fitnessFunction:
 #takes a population of chromosomes in Matrix form as an argument
 #returns a vector of distances each element corresponding to a chromosome
@@ -41,14 +47,33 @@ fitnessFunction <- function(pop) {
 
 
 #Main Function:
-NoOfCities = nrow(X)
-popSize = 20 #no of chromosomes in each population
+#Initialize Genetic Algorithm Parametes:
+NoOfCities = nrow(X) #Number of Cities
+popSize = 10 #no of chromosomes in each population
 pop = mat.or.vec(popSize,NoOfCities)
+keep = floor(popSize/2) #no prob = mat.or.vec(popSize,1)of chromosomes to keep on each iteration
+mutationRate = 0.2 #probability of mutation
+noMutations = ceiling((popSize-1)*mutationRate) #total number of mutations
+Matings = ceiling((popSize-keep)/2) #number of matings
+maxit = 200 #maximum number of iterations
 
-#populate population with random chromosomes:
+#populate initial population with random chromosomes:
 for (i in 1:popSize) {
   pop[i,] = sample(1:NoOfCities,NoOfCities) #creates a chromosome
 }
 
 #compute the fitness function on the initial population
 Lengths = fitnessFunction(pop)
+
+#selection
+total = sum(Lengths)
+prob = mat.or.vec(popSize,1)
+#Probability of each chromosome to be selected
+for (i in 1:popSize) {
+  prob[i] = 1- (Lengths[i]/total)
+  #This gives a higher probability value to the shortestt lengths
+  #Thus we need to select the chromosomes with the highest probability
+}
+#selects the elements of the population to be kept based on the probability distribution
+#as defined above
+selectedIndex = sample(1:popSize,keep,replace=TRUE,prob = prob)
