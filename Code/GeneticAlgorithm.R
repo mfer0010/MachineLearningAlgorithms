@@ -44,8 +44,6 @@ fitnessFunction <- function(pop) {
   distances
 }
 
-
-
 #Main Function:
 #Initialize Genetic Algorithm Parametes:
 NoOfCities = nrow(X) #Number of Cities
@@ -76,4 +74,16 @@ for (i in 1:popSize) {
 }
 #selects the elements of the population to be kept based on the probability distribution
 #as defined above
-selectedIndex = sample(1:popSize,keep,replace=TRUE,prob = prob)
+odds = sample(1:popSize,keep,replace=TRUE,prob = prob)
+#indices of the parents and Mating:
+mums = mat.or.vec(Matings,1)
+dads = mat.or.vec(Matings,1)
+for (i in 1:Matings) {
+  mums[i] = odds[i]
+  dads[i] = odds[i+2]
+  #like this we will have 3 matings using all 
+  #the indices (odds[3] will be used twice)
+  #mating:
+  mate1=pop[mums[i],]
+  mate2=pop[dads[i],]
+}
