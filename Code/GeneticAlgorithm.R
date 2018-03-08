@@ -39,3 +39,16 @@ fitnessFunction <- function(pop) {
 }
 
 
+
+#Main Function:
+NoOfCities = nrow(X)
+popSize = 20 #no of chromosomes in each population
+pop = mat.or.vec(popSize,NoOfCities)
+
+#populate population with random chromosomes:
+for (i in 1:popSize) {
+  pop[i,] = sample(1:NoOfCities,NoOfCities) #creates a chromosome
+}
+
+#compute the fitness function on the initial population
+Lengths = fitnessFunction(pop)
