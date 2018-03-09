@@ -44,6 +44,35 @@ fitnessFunction <- function(pop) {
   distances
 }
 
+#mate function, mates 2 chromosomes given a pointer as
+#the starting pointer and returns a list of the 2 new 
+#child chromosomes
+mate <- function(mate1,mate2,pointer) {
+  temp = mate1
+  change = TRUE
+  #loop until all values are unique
+  while (change) {
+    #swap values
+    mate1[pointer]=mate2[pointer]
+    mate2[pointer]=temp[pointer]
+    #returns an array of indices which match the value at mate1[pointer]:
+    pointers = which(mate1==mate1[pointer],arr.ind = TRUE) 
+    #check if there exists an duplicate in the chromosome
+    change = FALSE
+    tempPointer = pointer
+    for (j in 1:length(pointers)) {
+      if (pointers[j]!=pointer) {
+        #if there's a duplicate, point to it
+        tempPointer = pointers[j]
+        change = TRUE
+      }
+    }
+    pointer = tempPointer
+  }
+  return(unname(rbind(mate1,mate2)))
+}
+
+
 #Main Function:
 #Initialize Genetic Algorithm Parametes:
 NoOfCities = nrow(X) #Number of Cities
@@ -78,12 +107,29 @@ odds = sample(1:popSize,keep,replace=TRUE,prob = prob)
 #indices of the parents and Mating:
 mums = mat.or.vec(Matings,1)
 dads = mat.or.vec(Matings,1)
+
+print(pop)
 for (i in 1:Matings) {
   mums[i] = odds[i]
   dads[i] = odds[i+2]
-  #like this we will have 3 matings using all 
-  #the indices (odds[3] will be used twice)
-  #mating:
+  #add them to the new population:
+  pop[i,] = pop[mums[i],]
+  pop[i+Matings,] = pop[dads[i],]
+}
+
+#like this we will have 3 mums, 3 dads
+#we need to mate twice in order to have 4 children
+#to fill the population, note this won't work for all population sizes
+child1 = mat.or.vec(Matings-1,NoOfCities)
+child2 = mat.or.vec(Matings-1,NoOfCities)
+for (i in 1:(Matings-1)) {
   mate1=pop[mums[i],]
   mate2=pop[dads[i],]
+  pointer = ceiling(runif(1,0,NoOfCities)) #random int between 1 and NoOfCities
+  children = mate(mate1,mate2,pointer) #call the mate function
+  child1[i,] = children[1,]
+  pop[i+(2*Matings),] = child1[i,]
+  child2[i,] = children[2,]
+  pop[i+(2*Matings)+2,] = child2[i,]
 }
+View(pop)
