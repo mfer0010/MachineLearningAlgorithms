@@ -72,64 +72,103 @@ mate <- function(mate1,mate2,pointer) {
   return(unname(rbind(mate1,mate2)))
 }
 
+#function that mutates the chromosome
+mutate <- function(chromosome) {
+  indices = sample(1:length(chromosome),2,replace=FALSE) #choose 2 random indices in the chromosome
+  #swap the elements
+  swapTemp = chromosome[indices[1]]
+  chromosome[indices[1]] = chromosome[indices[2]]
+  chromosome[indices[2]] = swapTemp
+  return(chromosome)
+}
+
 
 #Main Function:
 #Initialize Genetic Algorithm Parametes:
 NoOfCities = nrow(X) #Number of Cities
 popSize = 10 #no of chromosomes in each population
 pop = mat.or.vec(popSize,NoOfCities)
-keep = floor(popSize/2) #no prob = mat.or.vec(popSize,1)of chromosomes to keep on each iteration
+best = mat.or.vec(1,NoOfCities) #vector to keep the best chromosome so far
+keep = floor(popSize/2) #no of chromosomes to keep on each iteration
 mutationRate = 0.2 #probability of mutation
 noMutations = ceiling((popSize-1)*mutationRate) #total number of mutations
 Matings = ceiling((popSize-keep)/2) #number of matings
-maxit = 200 #maximum number of iterations
+maxit = 400 #maximum number of iterations
+bestVal = 999999 #Arbitrary large number
+
+#chromosomes that will survive and mate:
+kept = mat.or.vec(keep,NoOfCities)
+#stores the probability of each chromosome to survive
+prob = mat.or.vec(popSize,1)
 
 #populate initial population with random chromosomes:
 for (i in 1:popSize) {
   pop[i,] = sample(1:NoOfCities,NoOfCities) #creates a chromosome
 }
 
-#compute the fitness function on the initial population
+#MAIN LOOP:
+for (gen in 1:maxit) {
+  #compute the fitness function on the population
+  Lengths = fitnessFunction(pop)
+  #Save the best solution 
+  if (min(Lengths)<bestVal) {
+    best[1,] = pop[which.min(Lengths),]
+    bestVal = min(Lengths)
+    print(bestVal)
+  }
+
+  #selection
+  total = sum(Lengths)
+  #Probability of each chromosome to be selected
+  for (i in 1:popSize) {
+    prob[i] = 1- (Lengths[i]/total)
+    #This gives a higher probability value to the shortestt lengths
+    #Thus we need to select the chromosomes with the highest probability
+  }
+  #selects the elements of the population to be kept based on the probability distribution
+  #as defined above
+  odds = sample(1:popSize,keep,replace=TRUE,prob = prob)
+  #choose the chromosomes to be kept and store them in the new population 
+  for (i in 1:keep) {
+    #keep a record of the parents kept:
+    kept[i,] = pop[odds[i],]
+    #add them to the new population:
+    pop[i,] = kept[i,]
+}
+
+  #Thus we have popSize-keep chromosomes left to fill up the new population
+  #thus no of matings = (popSize-keep)/2
+  index = keep +1
+  while (index < popSize) {
+    #mate1, mat2 are random integers between 1 and keep (index)
+    mate1=ceiling(runif(1, min=0, max=keep-1))
+    mate2=ceiling(runif(1, min=0, max=keep-1))
+    pointer = ceiling(runif(1,0,NoOfCities)) #random int between 1 and NoOfCities
+    children = mate(kept[mate1,],kept[mate2,],pointer) #call the mate function
+    #mutate with probability and save to population
+    if (runif(1)<=mutationRate) {
+      pop[index,] = mutate(children[1,])
+    } else {
+      pop[index,] = children[1,]
+    }
+    if (runif(1)<=mutationRate) {
+      pop[index+1,] = mutate(children[2,])
+    } else {
+      pop[index+1,] = children[2,]
+    }
+    index=index+2
+  }
+
+  #Print iteration number
+  if (gen%%100==0) {
+    print(gen)
+  }
+}
+#compute the fitness function on the population
 Lengths = fitnessFunction(pop)
-
-#selection
-total = sum(Lengths)
-prob = mat.or.vec(popSize,1)
-#Probability of each chromosome to be selected
-for (i in 1:popSize) {
-  prob[i] = 1- (Lengths[i]/total)
-  #This gives a higher probability value to the shortestt lengths
-  #Thus we need to select the chromosomes with the highest probability
+#Save the best solution 
+if (min(Lengths)<bestVal) {
+  best[1,] = pop[which.min(Lengths),]
+  bestVal = min(Lengths)
+  print(bestVal)
 }
-#selects the elements of the population to be kept based on the probability distribution
-#as defined above
-odds = sample(1:popSize,keep,replace=TRUE,prob = prob)
-#indices of the parents and Mating:
-mums = mat.or.vec(Matings,1)
-dads = mat.or.vec(Matings,1)
-
-print(pop)
-for (i in 1:Matings) {
-  mums[i] = odds[i]
-  dads[i] = odds[i+2]
-  #add them to the new population:
-  pop[i,] = pop[mums[i],]
-  pop[i+Matings,] = pop[dads[i],]
-}
-
-#like this we will have 3 mums, 3 dads
-#we need to mate twice in order to have 4 children
-#to fill the population, note this won't work for all population sizes
-child1 = mat.or.vec(Matings-1,NoOfCities)
-child2 = mat.or.vec(Matings-1,NoOfCities)
-for (i in 1:(Matings-1)) {
-  mate1=pop[mums[i],]
-  mate2=pop[dads[i],]
-  pointer = ceiling(runif(1,0,NoOfCities)) #random int between 1 and NoOfCities
-  children = mate(mate1,mate2,pointer) #call the mate function
-  child1[i,] = children[1,]
-  pop[i+(2*Matings),] = child1[i,]
-  child2[i,] = children[2,]
-  pop[i+(2*Matings)+2,] = child2[i,]
-}
-View(pop)
