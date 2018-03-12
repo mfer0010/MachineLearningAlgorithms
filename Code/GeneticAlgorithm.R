@@ -88,12 +88,13 @@ mutate <- function(chromosome) {
 NoOfCities = nrow(X) #Number of Cities
 popSize = 10 #no of chromosomes in each population
 pop = mat.or.vec(popSize,NoOfCities)
+pop2 = mat.or.vec(popSize,NoOfCities)
 best = mat.or.vec(1,NoOfCities) #vector to keep the best chromosome so far
-keep = floor(popSize/2) #no of chromosomes to keep on each iteration
-mutationRate = 0.2 #probability of mutation
-noMutations = ceiling((popSize-1)*mutationRate) #total number of mutations
+keep = 6 #no of chromosomes to be chosen as parents
+mutationRate = 0.4 #probability of mutation
+#noMutations = ceiling((popSize-1)*mutationRate) #total number of mutations
 Matings = ceiling((popSize-keep)/2) #number of matings
-maxit = 400 #maximum number of iterations
+maxit = 5000 #maximum number of iterations
 bestVal = 999999 #Arbitrary large number
 
 #chromosomes that will survive and mate:
@@ -122,47 +123,52 @@ for (gen in 1:maxit) {
   #Probability of each chromosome to be selected
   for (i in 1:popSize) {
     prob[i] = 1- (Lengths[i]/total)
-    #This gives a higher probability value to the shortestt lengths
+    #This gives a higher probability value to the shortest lengths
     #Thus we need to select the chromosomes with the highest probability
   }
   #selects the elements of the population to be kept based on the probability distribution
   #as defined above
   odds = sample(1:popSize,keep,replace=TRUE,prob = prob)
   #choose the chromosomes to be kept and store them in the new population 
+  #keep the best and second best solutions
+  pop2[1,]=pop[which.min(Lengths),]
+  pop2[2,]=pop[which(Lengths==sort(Lengths,decreasing=TRUE)[popSize-1])[1],]
+  #choose parents, we'll choose 3 mums and 3 dads, to have 6 kids:
   for (i in 1:keep) {
     #keep a record of the parents kept:
     kept[i,] = pop[odds[i],]
-    #add them to the new population:
-    pop[i,] = kept[i,]
-}
+  }
 
-  #Thus we have popSize-keep chromosomes left to fill up the new population
-  #thus no of matings = (popSize-keep)/2
-  index = keep +1
-  while (index < popSize) {
-    #mate1, mat2 are random integers between 1 and keep (index)
+  index = 3
+  while (index < 9) {
+    #mate1, mate2 are random integers between 1 and keep (index)
     mate1=ceiling(runif(1, min=0, max=keep-1))
     mate2=ceiling(runif(1, min=0, max=keep-1))
     pointer = ceiling(runif(1,0,NoOfCities)) #random int between 1 and NoOfCities
     children = mate(kept[mate1,],kept[mate2,],pointer) #call the mate function
     #mutate with probability and save to population
     if (runif(1)<=mutationRate) {
-      pop[index,] = mutate(children[1,])
+      pop2[index,] = mutate(children[1,])
     } else {
-      pop[index,] = children[1,]
+      pop2[index,] = children[1,]
     }
     if (runif(1)<=mutationRate) {
-      pop[index+1,] = mutate(children[2,])
+      pop2[index+1,] = mutate(children[2,])
     } else {
-      pop[index+1,] = children[2,]
+      pop2[index+1,] = children[2,]
     }
     index=index+2
+  }
+  #Randomly fill remaining part of population with chromosomes
+  for (i in 9:10) {
+    pop2[i,] = sample(1:NoOfCities,NoOfCities) #creates a chromosome
   }
 
   #Print iteration number
   if (gen%%100==0) {
     print(gen)
   }
+  pop = pop2
 }
 #compute the fitness function on the population
 Lengths = fitnessFunction(pop)
@@ -172,3 +178,4 @@ if (min(Lengths)<bestVal) {
   bestVal = min(Lengths)
   print(bestVal)
 }
+print(best[1,])
