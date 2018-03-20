@@ -12,12 +12,12 @@ get_tours <- function(starting_nodes, no_of_ants, no_of_cities, prob,tau, alpha,
     newProb = prob
     for (j in 1:no_of_cities-1) {
       c = starting_nodes[i,j]
-      newProb[,c] = 0
+      newProb[i,c] = 0
       #p is the probability of choosing the next sub solution
-      p = (tau[c,]^beta)*(newProb[c,]^alpha)/sum(temp)
+      p = (tau[c,]^beta)*(newProb[c,]^alpha)/sum((tau[c,]^beta)*(newProb[c,]^alpha))
       rand = runif(1)
       sum = 0
-      for (k in 1:n) {
+      for (k in 1:no_of_cities-1) {
         sum = sum + p[k]
         if (rand <= sum) {
           starting_nodes[i,j+1]=k
@@ -28,7 +28,7 @@ get_tours <- function(starting_nodes, no_of_ants, no_of_cities, prob,tau, alpha,
   starting_nodes
 }
 
-#Function to calulate the costs of the ants' tours
+#Function to calulate the costs of the ants' toursr
 #TO Do
 
 #Function to update pheromones
@@ -52,6 +52,7 @@ beta = 4
 #other variables:
 no_of_cities = nrow(X)
 Tau = matrix(0.00001,nrow = no_of_cities, ncol = no_of_cities) #initial pheromone matrix
+starting_nodes = mat.or.vec(no_of_ants,1)
 #elimination = 0.97 #common ost elimination
 
 #generate distance between cities matrix
@@ -59,7 +60,7 @@ Distances = matrix(0,nrow = no_of_cities,ncol = no_of_cities)
 Prob = Distances
 for (i in 1:no_of_cities) {
   for (j in 1:no_of_cities) {
-    Distances[i,j] = sqrt((X[i]-X[j])^2+(Y[i]-Y[j])^2)
+    Distances[i,j] = sqrt((X[i,1]-X[j,1])^2+(Y[i,1]-Y[j,1])^2)
   }
 }
 
@@ -75,4 +76,13 @@ for (i in 1:no_of_cities) {
 }
 
 #Main Algorithm Loop:
-#TO DO
+for (i in 1:max_iter) {
+  #select starting nodes for each ant
+  starting_nodes = sample(1:no_of_cities,no_of_ants,replace = TRUE)
+  routes = matrix(0,nrow = no_of_ants,ncol = no_of_cities)
+  for (j in 1:no_of_ants) {
+    routes[j,1] = starting_nodes[j]
+  }
+  routes = get_tours(routes,no_of_ants,no_of_cities,Prob,Tau,alpha,beta)
+  
+}
