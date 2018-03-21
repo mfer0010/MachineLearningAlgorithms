@@ -6,83 +6,66 @@ X = Data[2] #X coordinates indexed by city
 Y = Data[3] #Y coordinats indexed by city
 rm(Data) #remove Data (not needed)
 
-#Function to calculate the tours of the ants for 1 cycle
-get_tours <- function(starting_nodes, no_of_ants, no_of_cities, prob,tau, alpha, beta) {
-  for (i in 1:no_of_ants) {
-    newProb = prob
-    for (j in 1:no_of_cities-1) {
-      c = starting_nodes[i,j]
-      newProb[i,c] = 0
-      #p is the probability of choosing the next sub solution
-      p = (tau[c,]^beta)*(newProb[c,]^alpha)/sum((tau[c,]^beta)*(newProb[c,]^alpha))
-      rand = runif(1)
-      sum = 0
-      for (k in 1:no_of_cities-1) {
-        sum = sum + p[k]
-        if (rand <= sum) {
-          starting_nodes[i,j+1]=k
-        }
-      }
-    }
+############
+#Parameters# <- adjusting these would change the performance of the algorithm
+############
+no_of_ants = 10 #no of ants in each iteration
+max_iter = 10 #maximum number of iterations
+evaporation_rate = 0.15 #evaporation rate of pheromones
+alpha = 1 #alpha and beta are paramenters for calculating the prob matrix
+beta = 4
+
+###########
+#Functions#
+###########
+#this function returns the reciprocal of a number, unless that number is 0
+probValues <- function(number) {
+  if (number == 0) {
+    number
+  } else {
+    1/number
   }
-  starting_nodes
 }
 
-#Function to calulate the costs of the ants' toursr
-#TO Do
-
-#Function to update pheromones
-#TO DO
-
-###############################################################
-#                       Main Function                         #
-###############################################################
-# This function will use the ACO method to find the shortest  #
-# path to solve the symmetric TSP                             #
-# TO DO:                                                      #
-# -> Explenation of the parts of the algorithm                #
-# -> Explenation of the parameters to modify                  #
-###############################################################
-#parameters:
-max_iter = 10
-no_of_ants = 10
-evaporation_rate = 0.15
-alpha = 1
-beta = 4
-#other variables:
+#################
+#Other Variables#
+#################
 no_of_cities = nrow(X)
 Tau = matrix(0.00001,nrow = no_of_cities, ncol = no_of_cities) #initial pheromone matrix
 starting_nodes = mat.or.vec(no_of_ants,1)
-#elimination = 0.97 #common ost elimination
-
+dontStop = TRUE
 #generate distance between cities matrix
 Distances = matrix(0,nrow = no_of_cities,ncol = no_of_cities)
 Prob = Distances
-for (i in 1:no_of_cities) {
-  for (j in 1:no_of_cities) {
+iter = 0
+#Note that Distances is a symmetric matrix since we're working out the Symetric TSP
+#, thus in order to improve complexity first the lower triangular part is worked out, 
+#then its transpose is added to itself.
+for (i in 2:no_of_cities) {
+  for (j in 1:i) {
     Distances[i,j] = sqrt((X[i,1]-X[j,1])^2+(Y[i,1]-Y[j,1])^2)
   }
 }
+Prob = apply(Distances,c(1,2),probValues) #Genarate the Prob Matrix (see function probValues)
+Distances = Distances + t(Distances)
+Prob = Prob + t(Prob)
 
-#generate probability matrix
-for (i in 1:no_of_cities) {
-  for (j in 1:no_of_cities) {
-    if (Distances[i,j]==0) {
-      Prob[i,j] = 0
-    } else {
-      Prob[i,j] = 1/Distances[i,j]
-    }
-  }
-}
-
-#Main Algorithm Loop:
-for (i in 1:max_iter) {
-  #select starting nodes for each ant
+#####################
+#Main Algorithm Loop#
+#####################
+while (dontStop) {
+  #initialize each ant in a starting node
   starting_nodes = sample(1:no_of_cities,no_of_ants,replace = TRUE)
-  routes = matrix(0,nrow = no_of_ants,ncol = no_of_cities)
-  for (j in 1:no_of_ants) {
-    routes[j,1] = starting_nodes[j]
-  }
-  routes = get_tours(routes,no_of_ants,no_of_cities,Prob,Tau,alpha,beta)
+  routes = matrix(0,nrow = no_of_ants,ncol = no_of_cities) #routes will store the routes of the ants
+  routes[,1] = starting_nodes
   
+  #generate the routes for each ant
+  
+  #build a solution
+  
+  #update pheromone values
+  
+  #Stopping Criteria:
+  iter = iter+1
+  dontStop = iter<=max_iter
 }
