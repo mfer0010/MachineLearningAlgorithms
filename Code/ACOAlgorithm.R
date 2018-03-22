@@ -10,7 +10,7 @@ rm(Data) #remove Data (not needed)
 #Parameters# <- adjusting these would change the performance of the algorithm
 ############
 no_of_ants = 10 #no of ants in each iteration
-max_iter = 10 #maximum number of iterations
+max_iter = 100 #maximum number of iterations
 evaporation_rate = 0.15 #evaporation rate of pheromones
 alpha = 1 #alpha and beta are paramenters for calculating the prob matrix
 beta = 4
@@ -59,14 +59,24 @@ setRoutes <- function(Routes, Heuristic, Tau) {
 fitnessFunction <- function(Routes, Distances) {
   sum = mat.or.vec(nrow(Routes),1)
   #for each ant j
-  for (j in 1:nrow(Routes)) {  
+  for (j in 1:nrow(Routes)) { 
+    cities = Routes[j,]
     #for each city visited
     for (i in 1:(ncol(Routes)-1)) {
       #add up the distances
-      sum[j] = sum[j] + Distances[Routes[i],Routes[i+1]]
+      sum[j] = sum[j] + Distances[cities[i],cities[i+1]]
     }
   }
   sum
+}
+
+#function that updates pheromones after an iteration
+updatePheromones <- function(path, length, evaporation_rate, Tau) {
+  for (i in 1:(length(path)-1)) {
+    Tau[path[i],path[i+1]] = (1-evaporation_rate)*Tau[path[i],path[i+1]]+evaporation_rate*(length)^(-1);
+    Tau[path[i+1],path[i]] = Tau[path[i],path[i+1]] 
+  }
+  Tau
 }
 
 #################
@@ -92,6 +102,9 @@ Heuristic = apply(Distances,c(1,2),probValues) #Genarate the Heuristic Matrix (s
 Distances = Distances + t(Distances)
 Heuristic = Heuristic + t(Heuristic)
 
+bestRoute = mat.or.vec(no_of_cities,1)
+bestLength = 1e27 #Arbitrarily large number
+
 #####################
 #Main Algorithm Loop#
 #####################
@@ -105,10 +118,22 @@ while (dontStop) {
   routes = setRoutes(routes,Heuristic,Tau)
   
   #build a solution
+  lengths = mat.or.vec(no_of_ants,1)
+  lengths = fitnessFunction(routes, Distances)
+  
+  #save best route
+  bestAntIndex = which.min(lengths)
+  if (lengths[bestAntIndex]<bestLength) {
+    bestLength = lengths[bestAntIndex]
+    bestRoute = routes[bestAntIndex,]
+    print(bestLength)
+  }
   
   #update pheromone values
+  Tau = updatePheromones(routes[bestAntIndex,],lengths[bestAntIndex],evaporation_rate,Tau)
   
   #Stopping Criteria:
   iter = iter+1
+  if (iter%%10==0) {print(iter)}
   dontStop = iter<=max_iter
 }
