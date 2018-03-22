@@ -27,11 +27,13 @@ probValues <- function(number) {
   }
 }
 
+#function that accepts a matrix with the first column being the starting point of each ant and the other columns all being 0
+#a Heuristic Matrix and the pheromone value Matrix Tau and returns tours of each ant.
 setRoutes <- function(Routes, Heuristic, Tau) {
   #for every ant:
   for (i in (1:nrow(Routes))) {
     Memory = mat.or.vec(ncol(Routes),1) #Set Ant's memory to 0s 
-    Score = Tau*(Heuristic)^beta #Calculate score matrix
+    Score = (Tau^alpha)*(Heuristic)^beta #Calculate score matrix
     Memory[1] = Routes[i,1] #Add starting node to memory 
     #Loop until all cities have been visited:
     for (j in 2:ncol(Routes)) {
@@ -51,6 +53,20 @@ setRoutes <- function(Routes, Heuristic, Tau) {
     Routes[i,] = Memory
   }
   Routes
+}
+
+#function that calculates the length of each tour
+fitnessFunction <- function(Routes, Distances) {
+  sum = mat.or.vec(nrow(Routes),1)
+  #for each ant j
+  for (j in 1:nrow(Routes)) {  
+    #for each city visited
+    for (i in 1:(ncol(Routes)-1)) {
+      #add up the distances
+      sum[j] = sum[j] + Distances[Routes[i],Routes[i+1]]
+    }
+  }
+  sum
 }
 
 #################
