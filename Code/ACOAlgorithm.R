@@ -14,7 +14,7 @@ max_iter = 10 #maximum number of iterations
 evaporation_rate = 0.15 #evaporation rate of pheromones
 alpha = 1 #alpha and beta are paramenters for calculating the prob matrix
 beta = 4
-
+q0 = 0.7 #probability of using other ant's experience
 ###########
 #Functions#
 ###########
@@ -27,6 +27,32 @@ probValues <- function(number) {
   }
 }
 
+setRoutes <- function(Routes, Heuristic, Tau) {
+  #for every ant:
+  for (i in (1:nrow(Routes))) {
+    Memory = mat.or.vec(ncol(Routes),1) #Set Ant's memory to 0s 
+    Score = Tau*(Heuristic)^beta #Calculate score matrix
+    Memory[1] = Routes[i,1] #Add starting node to memory 
+    #Loop until all cities have been visited:
+    for (j in 2:ncol(Routes)) {
+      currentCity = Memory[j-1]
+      #set score to 0 for current city:
+      Score[,currentCity] = 0
+      ParticularScore = Score[currentCity,]
+      if (runif(1)<=q0) {
+        #find the city with the largest score:
+        Memory[j] = which.max(ParticularScore)
+      } else {
+        #Choose the next node based on probability
+        Probability = ParticularScore/sum(ParticularScore)
+        Memory[j] = sample(1:length(Probability),1,prob=Probability)
+      }
+    }
+    Routes[i,] = Memory
+  }
+  Routes
+}
+
 #################
 #Other Variables#
 #################
@@ -36,7 +62,7 @@ starting_nodes = mat.or.vec(no_of_ants,1)
 dontStop = TRUE
 #generate distance between cities matrix
 Distances = matrix(0,nrow = no_of_cities,ncol = no_of_cities)
-Prob = Distances
+Heuristic = Distances
 iter = 0
 #Note that Distances is a symmetric matrix since we're working out the Symetric TSP
 #, thus in order to improve complexity first the lower triangular part is worked out, 
@@ -46,9 +72,9 @@ for (i in 2:no_of_cities) {
     Distances[i,j] = sqrt((X[i,1]-X[j,1])^2+(Y[i,1]-Y[j,1])^2)
   }
 }
-Prob = apply(Distances,c(1,2),probValues) #Genarate the Prob Matrix (see function probValues)
+Heuristic = apply(Distances,c(1,2),probValues) #Genarate the Heuristic Matrix (see function probValues)
 Distances = Distances + t(Distances)
-Prob = Prob + t(Prob)
+Heuristic = Heuristic + t(Heuristic)
 
 #####################
 #Main Algorithm Loop#
@@ -60,6 +86,7 @@ while (dontStop) {
   routes[,1] = starting_nodes
   
   #generate the routes for each ant
+  routes = setRoutes(routes,Heuristic,Tau)
   
   #build a solution
   
