@@ -64,7 +64,44 @@
 	
 	\section{Ant-Colony Optimisation}
 	\label{ACO}
+	\paragraph{} The Ant-colony Optimisation algorithm forms part of a class of population-based algorithms known as swarm intelligence (SI) that considers the collective behaviour of the population and individual solutions \cite{fastACO}. A general ACO algorithm has the following form \cite{scholarACO}:\\
+	\begin{lstlisting}
+	Set parameters, initialize pheromone trails
+	SCHEDULE ACTIVITIES
+		ConstructAntSolutions
+		DaemonActions  {optional}
+		UpdatePheromones
+	END_SCHEDULE_ACTIVITIES
+	\end{lstlisting}
 	
+	\par The parameters initialised for my implementation of the Ant Colony Optimisation Algorithm are as follows:
+	\begin{enumerate}
+		\item \underline{no\_of\_ants}: the number of ants in each iteration.
+		\item \underline{max\_iter}: the maximum number of iterations.
+		\item \underline{evaporation\_rate}: the rate at which the pheromones evaporate.
+		\item \underline{alpha}: a parameter for calculating the probability of an ant selecting a certain route. Alpha gives more weighting to the pheromone values.
+		\item \underline{beta}: a parameter for calculating the probability of an ant selecting a certain route. Beta gives more weighting to the heuristic value.
+		\item \underline{q0}: this parameter gives the probability of using the previous ants' experience over selecting a random path.
+	\end{enumerate} 
+	\par Since the task at hand is to write an algorithm to solve the symmetric TSP and R is optimised for working with matrix algebra, the distances between each city were calculated as an initialisation step in order to avoid having to compute these values each time on every ant run. The distances between each city were stored in a symmetric matrix thus only the lower triangular matrix needed to be worked out using for loops.\\
+	
+	\par In order to construct the ant solutions, initially, each ant is placed at random on a city. At each step, the ant then chooses the next city based on the probability matrix given in Equation \ref{ACOProb}.
+	
+	\begin{equation}
+	\label{ACOProb}
+	p^k_{ij}(t)=\frac{[\tau_{ij}(t)]^{\alpha}.[\eta_{ij}]^{\beta}}{\sum_{l\in\mathcal{N}^k_i}[\tau_{il}(t)]^{\alpha}.[\eta_{il}]^{\beta}}\ if\ j\in\mathcal{N}^k_i
+	\end{equation}
+	Where $p^k_{ij}(t)$ is the probability that ant $k$ goes to city $j$ from city $i$ at iteration $t$, $\tau_{ij}(t)$ is the pheromone value on edge $ij$ at iteration $t$, $\eta_{ij}$ is the heuristic value on edge $ij$ and $\mathcal{N}^k_i$ is the set of all possible nodes reachable by ant $k$ from node $i$ which in our case will be the set of all possible nodes not yet visited by ant $k$ \cite{GargACO}.\\
+	
+	\par The ant with the best solution after each iteration will then update the pheromone values of each edge and is defined as seen in Equation \ref{pheromoneUpdate} \cite{fastACO}.
+	\begin{equation}
+	\label{pheromoneUpdate}
+	\begin{split}
+	\tau_{ij} &= (1-\rho)\tau_{ij}+\rho\sum_{k=1}^{m}\triangle\tau_{ij}^{k},\\
+	\triangle\tau_{ij}^{k} &=\frac{1}{L^k}
+	\end{split}	
+	\end{equation}
+	Where $m$ is the number of ants, and $L^k$ is the length of the best tour of that iteration. All pheromone values also evaporate at a rate defined by the parameter after each iteration.
 	\section{Results and Comparisons}
 	\label{Results}
 	
@@ -110,5 +147,22 @@
 		Haupt, R.L., \& Haupt, S.E. (2004).
 		\textit{Practical Genetic Algorithms} (2nd ed.). Hoboken: Wiley.
 		
+		\bibitem{fastACO}
+		Tseng, S.P., et. al.
+		\textit{A fast Ant Colony Optimization for traveling salesman problem}.
+		\\\texttt{https://ieeexplore-ieee-org.ejournals.um.edu.mt/document/5586153/?reload=true}.
+		\\{[23rd July 2010]}.
+		
+		\bibitem{scholarACO}
+		Dorgio, M.
+		\textit{Ant colony optimization}.
+		\\\texttt{http://www.scholarpedia.org/article/Ant\_colony\_optimization}.
+		\\{[2007]}.
+		
+		\bibitem{GargACO}
+		Garg D., Shah S.
+		\textit{ANT COLONY OPTIMIZATION FOR SOLVING TRAVELING DALESMAN PROBLEM}.
+		\textit{International Journal of Computer Science and System Analysis}, vol. 5, no. 1, pp. 23-29, 2011.\\
+		available: \texttt{http://www.serialsjournals.com/serialjournalmanager/pdf/1330336909.pdf}
 	\end{thebibliography}	
 \end{document}
