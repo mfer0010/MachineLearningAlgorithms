@@ -10,11 +10,12 @@ rm(Data) #remove Data (not needed)
 #Parameters# <- adjusting these would change the performance of the algorithm
 ############
 no_of_ants = 10 #no of ants in each iteration
-max_iter = 100 #maximum number of iterations
+max_iter = 1000 #maximum number of iterations
 evaporation_rate = 0.15 #evaporation rate of pheromones
 alpha = 1 #alpha and beta are paramenters for calculating the prob matrix
 beta = 4
-q0 = 0.7 #probability of using other ant's experience
+q0 = 0.6 #probability of using other ant's experience
+
 ###########
 #Functions#
 ###########
@@ -137,3 +138,5 @@ while (dontStop) {
   if (iter%%10==0) {print(iter)}
   dontStop = iter<=max_iter
 }
+
+print(bestRoute)

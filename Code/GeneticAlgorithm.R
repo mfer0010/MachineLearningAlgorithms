@@ -7,8 +7,7 @@ Y = Data[3] #Y coordinats indexed by city
 rm(Data) #remove Data (not needed)
 
 #Normalize points to be between 0 and 1
-#This step is done so that our selection probabilities won't all have such 
-#large values
+#This is an optimisation step to improve the speed of the function
 X = X/max(X)
 Y = Y/max(Y)
 
@@ -95,7 +94,7 @@ mutationRate = 0.4 #probability of mutation
 #noMutations = ceiling((popSize-1)*mutationRate) #total number of mutations
 Matings = ceiling((popSize-keep)/2) #number of matings
 maxit = 5000 #maximum number of iterations
-bestVal = 999999 #Arbitrary large number
+bestVal = 1e+22 #Arbitrary large number
 
 #chromosomes that will survive and mate:
 kept = mat.or.vec(keep,NoOfCities)
