@@ -106,6 +106,12 @@ Heuristic = Heuristic + t(Heuristic)
 bestRoute = mat.or.vec(no_of_cities,1)
 bestLength = 1e27 #Arbitrarily large number
 
+optTour = c(1,28,6,12,9,5,26,29,3,2,20,10,4,15,18,17,14,22,11,19,25,7,23,27,8,24,16,13,21)#bays29
+optDistance = 0
+for (i in 2:no_of_cities) {
+  optDistance = optDistance + Distances[optTour[i-1],optTour[i]]
+}
+
 #####################
 #Main Algorithm Loop#
 #####################
