@@ -6,6 +6,7 @@ X = Data[2] #X coordinates indexed by city
 Y = Data[3] #Y coordinats indexed by city
 rm(Data) #remove Data (not needed)
 
+
 ############
 #Parameters# <- adjusting these would change the performance of the algorithm
 ############

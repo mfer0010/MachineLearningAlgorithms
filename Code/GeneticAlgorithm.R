@@ -34,8 +34,8 @@ fitnessFunction <- function(pop) {
     #for every city in the chromosome
     distance = 0
     for (j in 1:Ncity){
-      #fitness function as defined in Equation 1 of my Documantation
-      temp = sqrt(((X[chromosome[j+1],1]-X[chromosome[j],1])^2+(Y[chromosome[j+1],1]-Y[chromosome[j],1])^2)^2)
+      #fitness function as defined in Equation 1 of my Documentation
+      temp = sqrt(((X[chromosome[j+1],1]-X[chromosome[j],1])^2+(Y[chromosome[j+1],1]-Y[chromosome[j],1])^2))
       distance = distance + temp
     }
     distances[i]=distance
@@ -94,7 +94,16 @@ mutationRate = 0.4 #probability of mutation
 #noMutations = ceiling((popSize-1)*mutationRate) #total number of mutations
 Matings = ceiling((popSize-keep)/2) #number of matings
 maxit = 5000 #maximum number of iterations
+
+optTour = c(1,28,6,12,9,5,26,29,3,2,20,10,4,15,18,17,14,22,11,19,25,7,23,27,8,24,16,13,21)#bays29
+optDistance = 0
+for (i in 2:NoOfCities) {
+  optDistance = optDistance + sqrt((X[optTour[i-1],1]-X[optTour[i],1])^2+(Y[optTour[i-1],1]-Y[optTour[i],1])^2)
+}
+
 bestVal = 1e+22 #Arbitrary large number
+se = (bestVal-optDistance)^2
+iteration = 0
 
 #chromosomes that will survive and mate:
 kept = mat.or.vec(keep,NoOfCities)
@@ -114,6 +123,8 @@ for (gen in 1:maxit) {
   if (min(Lengths)<bestVal) {
     best[1,] = pop[which.min(Lengths),]
     bestVal = min(Lengths)
+    se = c(se,(bestVal-optDistance)^2) #standard error for graph
+    iteration = c(iteration,gen)  #iter number for graph
     print(bestVal)
   }
 
@@ -175,6 +186,9 @@ Lengths = fitnessFunction(pop)
 if (min(Lengths)<bestVal) {
   best[1,] = pop[which.min(Lengths),]
   bestVal = min(Lengths)
+  se = c(se,(bestVal-optDistance)^2) #standard error for graph
+  iteration = c(iteration,gen)  #iter number for graph
   print(bestVal)
 }
 print(best[1,])
+plot(iteration[-1],se[-1],type="l",main="S.E. vs. Iteration Number",xlab="Iteration",ylab="S.E.")
