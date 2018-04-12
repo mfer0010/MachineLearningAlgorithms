@@ -115,6 +115,8 @@ for (i in 1:popSize) {
   pop[i,] = sample(1:NoOfCities,NoOfCities) #creates a chromosome
 }
 
+#set starting time:
+start_time = as.numeric(Sys.time())*1000;
 #MAIN LOOP:
 for (gen in 1:maxit) {
   #compute the fitness function on the population
@@ -125,6 +127,7 @@ for (gen in 1:maxit) {
     bestVal = min(Lengths)
     se = c(se,(bestVal-optDistance)^2) #standard error for graph
     iteration = c(iteration,gen)  #iter number for graph
+    end_time=as.numeric(Sys.time())*1000
     print(bestVal)
   }
 
@@ -188,7 +191,9 @@ if (min(Lengths)<bestVal) {
   bestVal = min(Lengths)
   se = c(se,(bestVal-optDistance)^2) #standard error for graph
   iteration = c(iteration,gen)  #iter number for graph
+  end_time=as.numeric(Sys.time())*1000
   print(bestVal)
 }
+paste("Time Taken: ",end_time-start_time)
 print(best[1,])
 plot(iteration[-1],se[-1],type="l",main="S.E. vs. Iteration Number",xlab="Iteration",ylab="S.E.")

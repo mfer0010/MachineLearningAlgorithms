@@ -11,7 +11,7 @@ rm(Data) #remove Data (not needed)
 #Parameters# <- adjusting these would change the performance of the algorithm
 ############
 no_of_ants = 10 #no of ants in each iteration
-max_iter = 1000 #maximum number of iterations
+max_iter = 5000 #maximum number of iterations
 evaporation_rate = 0.15 #evaporation rate of pheromones
 alpha = 1 #alpha and beta are paramenters for calculating the prob matrix
 beta = 4
@@ -68,6 +68,7 @@ fitnessFunction <- function(Routes, Distances) {
       #add up the distances
       sum[j] = sum[j] + Distances[cities[i],cities[i+1]]
     }
+    sum[j] = sum[j] + Distances[cities[i+1],cities[1]]
   }
   sum
 }
@@ -84,6 +85,7 @@ updatePheromones <- function(path, length, evaporation_rate, Tau) {
 #################
 #Other Variables#
 #################
+start_time=as.numeric(Sys.time())*1000;
 no_of_cities = nrow(X)
 Tau = matrix(0.00001,nrow = no_of_cities, ncol = no_of_cities) #initial pheromone matrix
 starting_nodes = mat.or.vec(no_of_ants,1)
@@ -112,6 +114,8 @@ optDistance = 0
 for (i in 2:no_of_cities) {
   optDistance = optDistance + Distances[optTour[i-1],optTour[i]]
 }
+se = (bestLength-optDistance)^2
+iteration = 0
 
 #####################
 #Main Algorithm Loop#
@@ -134,6 +138,9 @@ while (dontStop) {
   if (lengths[bestAntIndex]<bestLength) {
     bestLength = lengths[bestAntIndex]
     bestRoute = routes[bestAntIndex,]
+    se = c(se,(bestLength-optDistance)^2) #standard error for graph
+    iteration = c(iteration,iter)  #iter number for graph
+    end_time = as.numeric(Sys.time())*1000
     print(bestLength)
   }
   
@@ -145,5 +152,6 @@ while (dontStop) {
   if (iter%%10==0) {print(iter)}
   dontStop = iter<=max_iter
 }
-
+paste("Time Taken: ",end_time-start_time)
 print(bestRoute)
+plot(iteration[-1],se[-1],type="l",main="S.E. vs. Iteration Number",xlab="Iteration",ylab="S.E.")
