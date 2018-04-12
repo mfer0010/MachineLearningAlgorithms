@@ -6,12 +6,16 @@ X = Data[2] #X coordinates indexed by city
 Y = Data[3] #Y coordinats indexed by city
 rm(Data) #remove Data (not needed)
 
+#Normalize points to be between 0 and 1
+#This is an optimisation step to improve the speed of the function
+X = X/max(X)
+Y = Y/max(Y)
 
 ############
 #Parameters# <- adjusting these would change the performance of the algorithm
 ############
 no_of_ants = 10 #no of ants in each iteration
-max_iter = 5000 #maximum number of iterations
+max_iter = 3000 #maximum number of iterations
 evaporation_rate = 0.15 #evaporation rate of pheromones
 alpha = 1 #alpha and beta are paramenters for calculating the prob matrix
 beta = 4
@@ -114,6 +118,7 @@ optDistance = 0
 for (i in 2:no_of_cities) {
   optDistance = optDistance + Distances[optTour[i-1],optTour[i]]
 }
+optDistance = optDistance + Distances[optTour[i],optTour[1]]
 se = (bestLength-optDistance)^2
 iteration = 0
 
