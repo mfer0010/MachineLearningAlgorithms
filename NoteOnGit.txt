@@ -1,7 +1,0 @@
-Before starting to work on the project:
--git pull
-
-When you're done making changes:
--git add .
--git commit -m "message"
--git push
