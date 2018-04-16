@@ -8,6 +8,7 @@
 \usepackage[final]{graphicx}
 \usepackage{setspace}
 \usepackage[final]{listings}
+\usepackage[final]{pdfpages}
 \usepackage{color}
 \usepackage{bm}
 \usepackage{microtype}
@@ -42,6 +43,7 @@
 	%\listoftables
 	%\lstlistoflistings
 	
+	\pagebreak
 	\section{Introduction}
 	\label{Intro}
 	\paragraph{} The Travelling Salesman Problem is a very common problem in the field of operations research. This has been studied extensively by mathematicians, computer scientists, and many great minds yet its complexity is still unknown \cite{TSP}. The problem statement is given as follows:\\
@@ -225,20 +227,75 @@
 			\caption{ACO Algorithm}					
 			\label{fig:ch130ACO}
 		\end{minipage}
-	\end{figure}	
+	\end{figure}
+	\hspace{0pt}\\
+	\textbf{Instance name: eli101.tsp}\\
+	\underline{GA method:} \textit{see listing \ref{GACode}}\\
+	\underline{ACO method:} \textit{see listing \ref{ACOCode}}\\
+	\hspace{0pt}\\
+	\begin{minipage}{0.475\textwidth}
+		\textbf{\underline{GA Performance:}}\\
+		\underline{Time Taken:} 893826.54ms\\
+		\underline{Best Distance Found:}{\hspace{2pt}}19.80362
+		\underline{Actual Optimal Distance:} 8.863002\\
+		\underline{Standard Error:} 119.6971
+	\end{minipage}
+	\begin{minipage}{0.475\textwidth}
+		\textbf{\underline{ACO Performance:}}\\
+		\underline{Time Taken:} 30574.32ms\\
+		\underline{Best Distance Found:}{\hspace{2pt}}9.75988
+		\underline{Actual Optimal Distance:} 8.863002\\
+		\underline{Standard Error:} 0.6458297
+	\end{minipage}
 	
-	%%TO DO: Possible methods for improving the Algorithms
-	%%Eventually fix length bug of opt distance in ACO
+	\begin{figure}[H]
+		%\centering
+		\begin{minipage}{.5\textwidth}
+			\centering
+			\includegraphics[scale= 0.4]{eli101GAPlot}
+			\caption{Genetic Algorithm}
+			\label{fig:eli101GA}
+		\end{minipage}
+		\begin{minipage}{.5\textwidth}
+			\centering
+			\includegraphics[scale=0.4]{eli101ACOPlot}
+			\caption{ACO Algorithm}					
+			\label{fig:eli101ACO}
+		\end{minipage}
+	\end{figure}		
+	\subsection{Methods for Improving the Performance of the Algorithms}
+	\paragraph{ }As can be clearly seen from the results above, the performance of the Genetic Algorithm is not great when compared to that of the ACO Algorithm. Here are some methods to possibly improve the performance of this algorithm.
+	\begin{enumerate}
+		\item The first obvious thing to do would be to adjust the parameters for each example until a combination is found which would provide a better solution.
+		\item When looking at Figure \ref{fig:ch130GA} it can be noted that the algorithm was still finding better solutions at higher iterations, increasing the maximum number of iterations for examples with  larger number of cities would also help improve the algorithm's performance.
+		\item Another optimisation step would be to change the selection operator of the GA. In its current state its possible for the algorithm to always select the same chromosomes as that solution improves since the probability value of a particular chromosome could approach 1. Possible workarounds to this would be to use a rank-based method \cite{rank} or a tournament based method \cite{tournament}.
+	\end{enumerate}
 	
 	\section{Conclusion}
 	\label{Conc}
+	\paragraph{ }In this paper we have seen two methods to approximate the solution to the symmetric Travelling Salesman Problem using Machine Learning Algorithms written in R. The written Ant Colony Optimisation algorithm seems to be clearly superior to the Genetic Algorithm in both speed and accuracy and from our plots it would seem that it also converges at a much faster rate. We also have seen methods of possibly improving the Genetic Algorithm's performance. Using Machine Learning algorithms to find reasonable solutions to NP Hard problems can be used as a very powerful tool in computer science and can give accurate results when done right. 
 	
 	\section{Statement of Completion}
 	\label{SoC}
-	
-	\section{Plagiarism Declaration Form}
-	\label{PlagForm}
-	
+	\begin{table}[H]
+		\centering
+		\begin{tabular}{|l|c|}
+			\hline
+			\textbf{Item} & \textbf{Completed(Yes/No/Partial)}\\
+			\hline
+			\hline
+			Implemented GA & Yes\\\hline
+			Implemented ACO & Yes\\\hline
+			Evaluated GA vs ACO for selected instances & Yes\\\hline
+			Described GA architecture in report & Yes\\\hline
+			Described ACO architecture in report & Yes\\\hline
+		\end{tabular}
+	\end{table}
+	\pagebreak
+	\includepdf[pages=1,pagecommand={\section{Plagiarism Declaration Form} \thispagestyle{empty}}, scale=0.75]{PDF.pdf}
+	%\section{}
+	%\label{PlagForm}
+	%\includepdf[scale=0.6]{PDF.pdf}
 	\section{Appendix}
 	\label{Appendix}
 	%Code Listings
@@ -663,5 +720,16 @@
 		\textit{ANT COLONY OPTIMIZATION FOR SOLVING TRAVELING DALESMAN PROBLEM}.
 		\textit{International Journal of Computer Science and System Analysis}, vol. 5, no. 1, pp. 23-29, 2011.\\
 		available: \texttt{http://www.serialsjournals.com/serialjournalmanager/pdf/1330336909.pdf}
+		
+		\bibitem{rank}
+		Whitley D.
+		\textit{The Gnitor Algorithm and Selection Pressure: Why Rank-Based Allocation of Reproductive Trials is Best}.\\
+		available:\\ \texttt{https://www.researchgate.net/profile/Darrell\_Whitley2/publication/2527551\_The\_}\\\texttt{GENITOR\_Algorithm\_and\_Selection\_Pressure\_Why\_Rank-Based\_Allocation\_of\_Reproductive}\\\texttt{\_Trials\_is\_Best/links/5632149808ae3de9381e72c5/The-GENITOR-Algorithm-and-}\\\texttt{Selection-Pressure-Why-Rank-Based-Allocation-of-Reproductive-Trials-is-Best.pdf}
+		
+		\bibitem{tournament}
+		Razali N.M., Geraghty J.
+		\textit{Genetic Algorithm Performance with Different Selection Strategies in Solving TSP}. \textit{Proceedings of the World Congress on Engineering}, vol. 2, 2011.\\
+		available:\\ \texttt{https://pdfs.semanticscholar.org/010b/545848cfd29fe6e83987d494fdd00b486229.pdf}
+		
 	\end{thebibliography}	
 \end{document}
